@@ -12,8 +12,13 @@ router.get('/',(req,res) =>{
 if(error){
   throw error;
 }else{
-  res.send(result);
+  //res.send(result);
+
+//  res.render('edit',{dev:'Aimar Alexander Contreras', skill: 'Javascrip', friends: ['Erick','Franco','Juan'] });
+
+res.render('index',{registros:result});
 }
+
   });
 
 });
