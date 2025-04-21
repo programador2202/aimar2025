@@ -1,36 +1,49 @@
-const express =require('express');
-const router = express.Router();
-const conexion=require('./database/db');
+const express = require('express');
 
-//req -> es una solicitud
-//res -> es una respuesta
-router.get('/',(req,res) =>{
-  //retornamos una Coleccion de datos
-  //consulta exitosa ->"result"
-  //erro es null ->"Error"
-  conexion.query("SELECT * FROM vehiculos",(error,result)=>{
-if(error){
-  throw error;
-}else{
-  //res.send(result);
-
-//  res.render('edit',{dev:'Aimar Alexander Contreras', skill: 'Javascrip', friends: ['Erick','Franco','Juan'] });
-
-res.render('index',{registros:result});
-}
-
+const router=express.Router();
+const conexion=require('./database/db')
+//require/req= solicitud| res=respuesta
+router.get('/', (req,res)=>{
+  //retornamos una coleccion de datos.Consulta exitosa "results", fallo "error"
+  conexion.query("SELECT * FROM VEHICULOS",(error, results)=>{
+    if(error){
+      throw error;
+    }else{
+      //Enviamos "json" los datos al navegador
+      //res.send(results);
+      res.render('index',{registros:results});
+    }
   });
-
 });
+//enrutador para el registro
+router.get('/create',(req,res)=>{//create url
+  res.render("create"); //create archivo
+})
 
-//enrutador  para el registro
-router.get('/create',(req,res) =>{
-  res.render("create");
-});
+router.get('/delete/:id',(req,res)=>{
+  const idvehiculo=req.params.id;
+  conexion.query("DELETE FROM VEHICULOS WHERE id=?",[idvehiculo],(error,results)=>{
+    if(error){
+      throw(error);
+    }else{
+      res.redirect('/');
+    }
+  })
+})
 
+//Para editar, debemos identidicar el registro
+router.get('/edit/:id', (req,res)=>{
+  conexion.query("SELECT * FROM VEHICULOS WHERE id=?",[req.params.id],(error,results)=>{
+    if(error){
+      throw(error);
+    }else{
+      res.render('edit',{vehiculo:results[0]});
+    }
+  })
+})
 
 //acceder a toda la logica
 const crud=require('./controllers/crud');
-router.post('/save',crud.save);
-
+router.post('/save', crud.save);
+router.post('/update', crud.update);
 module.exports =router;
